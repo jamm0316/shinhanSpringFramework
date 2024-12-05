@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shinhan.emp">
+    <!--empVO에서 전달된 정보를 getter로 읽음.${FIRST_NAME} ==> getFirst_name()-->
+
+    <select id="selectAll" resultType="empVO">
+        select * from employees order by 1
+    </select>
+
+    <select id="selectJoin2" parameterType="String" resultType="map">
+        select employee_id, first_name, salary, department_name, city, country_name
+        from employees join departments using(department_id)
+        join locations using(location_id)
+        join countries USING (country_id)
+        where job_id = #{job_id}
+    </select>
+
+    <select id="selectAllJob" resultType="jobVO">
+        select * from jobs
+    </select>
+
+    <select id="selectJoin" parameterType="String" resultType="com.shinhan.myapp.emp.EmpJoinDTO">
+        select employee_id, first_name, salary, department_name, city, country_name
+        from employees join departments using(department_id)
+        join locations using(location_id)
+        join countries USING (country_id)
+        where job_id = #{job_id}
+    </select>
+
+    <select id="selectByDept" parameterType="int" resultType="empVO">
+        select * from employees
+        <if test="department_id != -1">
+            where department_id = #{department_id}
+        </if>
+    </select>
+
+    <select id="selectByJobid" parameterType="String" resultType="empVO">
+        select * from employees
+        <if test="department_id != -1">
+            where job_id = #{job_id}
+        </if>
+    </select>
+
+    <select id="selectBySalary" parameterType="double" resultType="empVO">
+        select * from employees where salary >= #{salary}
+    </select>
+
+    <!--map을 파라매터로 가져오기
+    map.put("#{department_id}", 값)  => mybatis가 map.get(department_id)
+    map.put("#{job_id}", 값)
+    map.put("#{salary}", 값)
+    map.put("#{hire_date}", 값) -->
+    <select id="selectByCondition" resultType="empVO" parameterType="map">
+        select *
+        from employees
+        where (-1 = #{deptid} or department_id = #{deptid})
+        and ('-1' = #{jobid} or job_id = #{jobid})
+        and salary >= #{salary}
+        and hire_date >= #{hdate}
+    </select>
+
+    <!--deptId가 -1이면 모든 부서, jobid = -1이면 모든 job-->
+    <select id="selectByCondition2" resultType="empVO" parameterType="map">
+        select *
+        from employees where salary >= #{salary}
+
+        <!--where가 동적으로 들어가야함.-->
+        <if test="deptid != -1">
+            and department_id = #{deptid}
+        </if>
+        <if test="jobid != '-1'">
+            and job_id = #{jobid}
+        </if>
+        <if test="hdate != '1900-01-01'">
+            and hire_date >= #{hdate}
+        </if>
+    </select>
+
+    <!--emplotees테이블에서 select한 칼럼의 정보를 empVO를 기본생성자로 생성하고 setter로 넣는다.-->
+    <select id="selectById" parameterType="int" resultType="empVO">
+        select * from employees where employee_id = #{employee_id}
+    </select>
+    <insert id="insert" parameterType="empVO">
+        <!--todo:null값 들어오는 것 체크할 것-->
+        insert into
+        EMPLOYEES (
+            EMPLOYEE_ID,
+            first_name,
+            last_name,
+            email,
+            phone_number,
+            hire_date,
+            job_id,
+            salary,
+            commission_pct,
+            manager_id,
+            department_id)
+        values (
+            #{employee_id},
+            #{first_name},
+            #{last_name},
+            #{email},
+            #{phone_number},
+            #{hire_date},
+            #{job_id},
+            #{salary},
+            #{commission_pct},
+
+            <if test="department_id == -1">
+                null,
+            </if>
+            <if test="department_id != -1">
+                #{manager_id},
+            </if>
+            <if test="department_id == -1">
+                null  <!-- 부서가 없으면 jsp페이지에서 -1이 온다. 그러므로 null을 준다. -->
+            </if>
+            <if test="department_id != -1">
+                #{department_id}
+            </if>
+        )
+    </insert>
+
+    <update id="update" parameterType="empVO">
+        update employees set
+        first_name=#{first_name},
+        last_name=#{last_name},
+        email=#{email},
+        phone_number=#{phone_number},
+        hire_date=#{hire_date},
+        job_id=#{job_id},
+        salary=#{salary},
+        commission_pct=#{commission_pct},
+        <if test="manager_id == -1">
+            manager_id=null,
+        </if>
+
+        <if test="manager_id != -1">
+        manager_id=#{manager_id},
+        </if>
+
+        <if test="department_id == -1">
+            department_id=null
+        </if>
+
+        <if test="department_id != -1">
+            department_id=#{department_id}
+        </if>
+
+        where employee_id=#{employee_id}
+    </update>
+    <delete id="delete" parameterType="int">
+        delete from employees where EMPLOYEE_ID=#{EMPLOYEE_ID}
+    </delete>
+</mapper>

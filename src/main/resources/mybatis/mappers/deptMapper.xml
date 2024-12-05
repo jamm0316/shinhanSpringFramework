@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shinhan.dept">
+    <select id="selectAll" resultType="deptVO">
+        select * from departments order by 1
+    </select>
+
+<!--    <resultMap id="deptVO2" type="com.shinhan.myapp.vo.DeptDTO2">-->
+<!--        <result property="dept_id" column="department_id"/>-->
+<!--        <result property="dept_name" column="department_name"/>-->
+<!--    </resultMap>-->
+<!--    &lt;!&ndash;DB의 칼럼이름과 java의 field이름이 다른 경우-->
+<!--    mapping시에 re.get() == dto.set 할 때 문제가 생김&ndash;&gt;-->
+<!--    <select id="selectAll2" resultType="deptVO2">-->
+<!--        select * from departments order by 1-->
+<!--    </select>-->
+
+
+    <select id="selectById" parameterType="int">
+        select * from departments where department_id = #{id}
+    </select>
+    <insert id="insert" parameterType="deptVO">
+        insert into departments(department_id, department_name, manager_id, location_id)
+        values(
+        #{department_id},
+        #{department_name},
+        #{manager_id},
+        #{location_id})
+    </insert>
+    <update id="update" parameterType="deptVO">
+        update departments set
+        department_name = #{department_name},
+        manager_id = #{manager_id},
+        location_id = #{location_id}
+        where department_id = #{department_idl}
+    </update>
+    <delete id="delete" parameterType="int">
+        delete from departments where department_id = #{department_id}
+    </delete>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss} %-5level - %msg%n"/>
+        </Console>
+        <RollingFile name="dailyFileAppender" 
+                     fileName="/Users/evan/Documents/Developer/log/output.log"
+                     filePattern="/Users/evan/Documents/Developer/log/output-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="[%d{HH:mm:ss}][%-5p](%F:%L)-%m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="jdbc.sqlonly" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="dailyFileAppender"/>
+        </Logger>
+        <Logger name="com.shinhan.myapp" level="INFO" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="dailyFileAppender"/>
+        </Logger>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="dailyFileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
